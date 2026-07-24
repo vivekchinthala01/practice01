@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="BookLoop — a community book exchange platform. Borrow, lend, exchange and buy used books from readers near you." />
+  <title>BookLoop — Books should be shared, not forgotten</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ============ Toast container ============ -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ============ Navigation ============ -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="#home" class="brand" aria-label="BookLoop home">
+        <span class="brand__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          </svg>
+        </span>
+        <span class="brand__name">Book<span>Loop</span></span>
+      </a>
+
+      <nav class="nav__links" id="navLinks" aria-label="Primary">
+        <a href="#home" class="nav__link is-active">Home</a>
+        <a href="#explore" class="nav__link">Explore Books</a>
+        <a href="#how" class="nav__link">How It Works</a>
+        <a href="#community" class="nav__link">Community</a>
+        <a href="#about" class="nav__link">About</a>
+      </nav>
+
+      <div class="nav__actions">
+        <button class="icon-btn" id="searchToggle" aria-label="Search books" title="Search">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </button>
+
+        <div class="dropdown">
+          <button class="icon-btn" id="notifToggle" aria-label="Notifications" title="Notifications" aria-expanded="false">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            <span class="badge" id="notifBadge">3</span>
+          </button>
+          <div class="dropdown__panel notif-panel" id="notifPanel" role="menu" aria-label="Notifications">
+            <div class="notif-panel__head">
+              <strong>Notifications</strong>
+              <button class="link-btn" id="clearNotifs">Clear all</button>
+            </div>
+            <div class="notif-list" id="notifList"></div>
+          </div>
+        </div>
+
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle dark mode" title="Toggle theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>
+        </button>
+
+        <div class="dropdown">
+          <button class="avatar-btn" id="profileToggle" aria-label="Your profile" aria-expanded="false">
+            <span class="avatar" style="--a:#c98a3b">AL</span>
+          </button>
+          <div class="dropdown__panel profile-panel" id="profilePanel" role="menu">
+            <div class="profile-panel__head">
+              <span class="avatar avatar--lg" style="--a:#c98a3b">AL</span>
+              <div>
+                <strong>Ava Larsen</strong>
+                <span>ava@bookloop.co</span>
+              </div>
+            </div>
+            <button class="menu-row" data-goto="dashboard">Dashboard</button>
+            <button class="menu-row" data-goto="mybooks">My Books</button>
+            <button class="menu-row" data-goto="chat">Messages</button>
+            <button class="menu-row" id="openLoginFromMenu">Log out</button>
+          </div>
+        </div>
+
+        <button class="btn btn--ghost hide-sm" id="loginBtn">Login</button>
+        <button class="btn btn--primary hide-sm" id="listBookBtn">List a Book</button>
+
+        <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- expandable search bar -->
+    <div class="nav-search" id="navSearch" hidden>
+      <div class="container">
+        <div class="nav-search__field">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="search" id="globalSearch" placeholder="Search by title, author or genre..." autocomplete="off" />
+          <button class="link-btn" id="closeSearch">Close</button>
+        </div>
+        <div class="search-suggest" id="searchSuggest"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ Mobile menu overlay ============ -->
+  <div class="mobile-menu" id="mobileMenu" hidden>
+    <a href="#home" class="mobile-menu__link">Home</a>
+    <a href="#explore" class="mobile-menu__link">Explore Books</a>
+    <a href="#how" class="mobile-menu__link">How It Works</a>
+    <a href="#community" class="mobile-menu__link">Community</a>
+    <a href="#about" class="mobile-menu__link">About</a>
+    <div class="mobile-menu__actions">
+      <button class="btn btn--ghost" id="loginBtnMobile">Login</button>
+      <button class="btn btn--primary" id="listBookBtnMobile">List a Book</button>
+    </div>
+  </div>
+
+  <main id="main">
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="home">
+      <div class="hero__bg" aria-hidden="true"></div>
+      <div class="container hero__inner">
+        <div class="hero__copy reveal">
+          <span class="pill">📚 A community that reads together</span>
+          <h1 class="hero__title">Books should be <span class="accent">shared</span>, not forgotten.</h1>
+          <p class="hero__sub">BookLoop connects readers nearby to borrow, lend, exchange and buy pre-loved books. Give your shelf a second life and discover your next favourite story just around the corner.</p>
+          <div class="hero__cta">
+            <a href="#explore" class="btn btn--primary btn--lg">Explore Books</a>
+            <button class="btn btn--outline btn--lg" id="heroListBtn">List Your Book</button>
+          </div>
+          <dl class="stats" id="heroStats">
+            <div><dt data-count="10000" data-suffix="+">0</dt><dd>Books Shared</dd></div>
+            <div><dt data-count="5000" data-suffix="+">0</dt><dd>Readers</dd></div>
+            <div><dt data-count="250" data-suffix="+">0</dt><dd>Communities</dd></div>
+          </dl>
+        </div>
+
+        <div class="hero__visual" aria-hidden="true">
+          <div class="orbit">
+            <div class="float-card float-card--1"><div class="book-mini" style="--c1:#c98a3b;--c2:#a9692a"></div><span>Atomic Habits</span></div>
+            <div class="float-card float-card--2"><div class="book-mini" style="--c1:#6b8f71;--c2:#4c6b52"></div><span>The Alchemist</span></div>
+            <div class="float-card float-card--3"><div class="book-mini" style="--c1:#8a6d5b;--c2:#6a5040"></div><span>Dune</span></div>
+            <div class="hero__hub">
+              <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              <span>Swap. Read. Repeat.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Find books near you -->
+      <div class="container">
+        <div class="finder reveal">
+          <div class="finder__field">
+            <label for="finderQuery">Book or author</label>
+            <input id="finderQuery" type="text" placeholder="e.g. Educated" />
+          </div>
+          <div class="finder__field">
+            <label for="finderLocation">Location</label>
+            <input id="finderLocation" type="text" placeholder="e.g. Downtown" />
+          </div>
+          <div class="finder__field">
+            <label for="finderCategory">Category</label>
+            <select id="finderCategory">
+              <option value="">All genres</option>
+              <option>Fiction</option>
+              <option>Non-fiction</option>
+              <option>Sci-Fi</option>
+              <option>Self-Help</option>
+              <option>Fantasy</option>
+              <option>Biography</option>
+            </select>
+          </div>
+          <button class="btn btn--primary finder__btn" id="finderBtn">Find Books</button>
+          <div class="finder__recent">
+            <span>Recent:</span>
+            <button class="chip" data-recent="Atomic Habits">Atomic Habits</button>
+            <button class="chip" data-recent="Dune">Dune</button>
+            <button class="chip" data-recent="Sapiens">Sapiens</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FEATURES ============ -->
+    <section class="section" id="features">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">Everything a reader needs</span>
+          <h2 class="section__title">One loop for all your books</h2>
+          <p class="section__lead">Borrow, exchange, buy or simply discover — BookLoop keeps your reading life flowing.</p>
+        </header>
+        <div class="feature-grid" id="featureGrid"></div>
+      </div>
+    </section>
+
+    <!-- ============ FEATURED BOOKS CAROUSEL ============ -->
+    <section class="section section--soft" id="explore">
+      <div class="container">
+        <header class="section__head section__head--row reveal">
+          <div>
+            <span class="eyebrow">Fresh on the shelf</span>
+            <h2 class="section__title">Featured books near you</h2>
+          </div>
+          <div class="carousel__nav">
+            <button class="icon-btn icon-btn--round" id="carPrev" aria-label="Previous">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <button class="icon-btn icon-btn--round" id="carNext" aria-label="Next">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        </header>
+      </div>
+      <div class="carousel" id="carousel">
+        <div class="carousel__track" id="carouselTrack"></div>
+      </div>
+    </section>
+
+    <!-- ============ DISCOVERY ============ -->
+    <section class="section" id="discover">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">Smart discovery</span>
+          <h2 class="section__title">Find exactly what you want to read</h2>
+        </header>
+
+        <div class="discover__tabs" id="discoverTabs" role="tablist">
+          <button class="tab is-active" data-tab="near" role="tab">Near You</button>
+          <button class="tab" data-tab="popular" role="tab">Popular</button>
+          <button class="tab" data-tab="recent" role="tab">Recently Added</button>
+          <button class="tab" data-tab="recommended" role="tab">Recommended</button>
+        </div>
+
+        <div class="discover__body">
+          <aside class="filters" id="filters" aria-label="Filters">
+            <div class="filters__head">
+              <strong>Filters</strong>
+              <button class="link-btn" id="resetFilters">Reset</button>
+            </div>
+            <div class="filter-group">
+              <label for="fGenre">Genre</label>
+              <select id="fGenre">
+                <option value="">All</option>
+                <option>Fiction</option><option>Non-fiction</option><option>Sci-Fi</option>
+                <option>Self-Help</option><option>Fantasy</option><option>Biography</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="fDistance">Distance: <span id="fDistanceVal">10</span> km</label>
+              <input type="range" id="fDistance" min="1" max="20" value="10" />
+            </div>
+            <div class="filter-group">
+              <label for="fType">Exchange type</label>
+              <select id="fType">
+                <option value="">Any</option>
+                <option value="Borrow">Borrow</option>
+                <option value="Exchange">Exchange</option>
+                <option value="Buy">Buy</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="check"><input type="checkbox" id="fAvailable" /> Available only</label>
+            </div>
+            <div class="filter-group">
+              <label for="fPrice">Max price: $<span id="fPriceVal">30</span></label>
+              <input type="range" id="fPrice" min="0" max="30" value="30" />
+            </div>
+          </aside>
+
+          <div class="discover__results">
+            <div class="results-bar">
+              <span id="resultCount">0 books</span>
+              <select id="sortSelect" aria-label="Sort books">
+                <option value="relevance">Sort: Relevance</option>
+                <option value="distance">Nearest first</option>
+                <option value="priceLow">Price: Low to High</option>
+                <option value="priceHigh">Price: High to Low</option>
+                <option value="rating">Top rated</option>
+              </select>
+            </div>
+            <div class="book-grid" id="bookGrid"></div>
+            <div class="empty-state" id="emptyState" hidden>
+              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <h3>No books found</h3>
+              <p>Try widening your filters or searching a different genre.</p>
+              <button class="btn btn--outline" id="clearFromEmpty">Clear filters</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HOW IT WORKS ============ -->
+    <section class="section section--soft" id="how">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">Simple by design</span>
+          <h2 class="section__title">How BookLoop works</h2>
+        </header>
+        <div class="how">
+          <div class="how__steps" id="howSteps"></div>
+          <div class="how__visual" id="howVisual"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ COMMUNITY ============ -->
+    <section class="section" id="community">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">People, not just pages</span>
+          <h2 class="section__title">A living reading community</h2>
+        </header>
+
+        <div class="community">
+          <div class="community__stats">
+            <div class="cstat"><strong id="cstat1">0</strong><span>Active readers today</span></div>
+            <div class="cstat"><strong id="cstat2">0</strong><span>Exchanges this week</span></div>
+            <div class="cstat"><strong id="cstat3">0</strong><span>Books added today</span></div>
+          </div>
+
+          <div class="community__feed">
+            <div class="feed">
+              <h3>Live activity</h3>
+              <div class="feed__list" id="feedList"></div>
+            </div>
+            <div class="trending">
+              <h3>Trending genres</h3>
+              <div class="trending__list" id="trendingList"></div>
+              <div class="community__cta">
+                <p>Ready to meet readers near you?</p>
+                <button class="btn btn--primary" id="joinCommunity">Join the Community</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DASHBOARD PREVIEW ============ -->
+    <section class="section section--soft" id="dashboard">
+      <div class="container">
+        <header class="section__head reveal">
+          <span class="eyebrow">Your reading HQ</span>
+          <h2 class="section__title">A dashboard built for readers</h2>
+          <p class="section__lead">Track your listings, borrows and exchanges — beautifully organised.</p>
+        </header>
+
+        <div class="dash">
+          <aside class="dash__side">
+            <button class="dash__nav is-active" data-dash="overview">Overview</button>
+            <button class="dash__nav" data-dash="mybooks">My Books</button>
+            <button class="dash__nav" data-dash="borrowed">Borrowed</button>
+            <button class="dash__nav" data-dash="requests">Exchange Requests</button>
+            <button class="dash__nav" data-dash="messages">Messages</button>
+            <button class="dash__nav" data-dash="saved">Saved Books</button>
+            <button class="dash__nav" data-dash="settings">Settings</button>
+          </aside>
+
+          <div class="dash__main" id="dashMain"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT / CTA ============ -->
+    <section class="section" id="about">
+      <div class="container">
+        <div class="about reveal">
+          <div class="about__copy">
+            <span class="eyebrow">Our story</span>
+            <h2 class="section__title">Built by readers, for readers</h2>
+            <p>BookLoop began with a simple frustration: shelves full of books that had already been read, gathering dust while someone nearby was hunting for that exact title. We built a warm, community-first way to keep stories moving — lending, swapping and rehoming books instead of letting them sit idle.</p>
+            <ul class="about__list">
+              <li>Reduce waste by giving books a second life</li>
+              <li>Make reading affordable for students and locals</li>
+              <li>Turn neighbours into a reading community</li>
+            </ul>
+            <button class="btn btn--primary" id="aboutJoin">Start your library</button>
+          </div>
+          <div class="about__panel">
+            <div class="about__quote">
+              <p>"I&apos;ve borrowed 14 books this year without spending a cent, and met three readers on my street."</p>
+              <div class="about__author"><span class="avatar" style="--a:#6b8f71">MJ</span><div><strong>Mia J.</strong><span>Member since 2024</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <a href="#home" class="brand">
+          <span class="brand__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </span>
+          <span class="brand__name">Book<span>Loop</span></span>
+        </a>
+        <p>Books should be shared, not forgotten.</p>
+      </div>
+      <nav class="footer__col"><h4>Product</h4><a href="#explore">Explore</a><a href="#how">How it works</a><a href="#dashboard">Dashboard</a></nav>
+      <nav class="footer__col"><h4>Community</h4><a href="#community">Readers</a><a href="#about">About</a><a href="#" id="footerJoin">Join</a></nav>
+      <nav class="footer__col"><h4>Support</h4><a href="#">Help center</a><a href="#">Contact</a><a href="#">Privacy</a></nav>
+    </div>
+    <div class="container footer__bottom">
+      <span>© <span id="year"></span> BookLoop. Crafted for readers.</span>
+      <span>Made with warmth 🤎</span>
+    </div>
+  </footer>
+
+  <!-- ============ FLOATING CHAT BUTTON ============ -->
+  <button class="fab" id="chatFab" aria-label="Open messages">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span class="badge" id="chatFabBadge">2</span>
+  </button>
+
+  <!-- ============ BOOK DETAILS MODAL ============ -->
+  <div class="modal" id="bookModal" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal__close" data-close aria-label="Close">✕</button>
+      <div class="modal__content" id="bookModalContent"></div>
+    </div>
+  </div>
+
+  <!-- ============ AUTH MODAL ============ -->
+  <div class="modal" id="authModal" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__dialog modal__dialog--auth" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <button class="modal__close" data-close aria-label="Close">✕</button>
+      <div class="auth">
+        <div class="auth__tabs">
+          <button class="auth__tab is-active" data-auth="login">Login</button>
+          <button class="auth__tab" data-auth="register">Register</button>
+        </div>
+
+        <!-- LOGIN -->
+        <form class="auth__form" id="loginForm" novalidate>
+          <h2 id="authTitle">Welcome back</h2>
+          <p class="auth__sub">Log in to continue your reading loop.</p>
+          <div class="field">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" placeholder="you@email.com" required />
+            <small class="field__err"></small>
+          </div>
+          <div class="field">
+            <label for="loginPassword">Password</label>
+            <div class="field__pw">
+              <input type="password" id="loginPassword" placeholder="••••••••" required />
+              <button type="button" class="pw-toggle" data-pw="loginPassword" aria-label="Show password">👁</button>
+            </div>
+            <small class="field__err"></small>
+          </div>
+          <div class="auth__row">
+            <label class="check"><input type="checkbox" id="rememberMe" /> Remember me</label>
+            <button type="button" class="link-btn">Forgot password?</button>
+          </div>
+          <button type="submit" class="btn btn--primary btn--block">Log In</button>
+          <div class="auth__divider"><span>or continue with</span></div>
+          <div class="auth__social">
+            <button type="button" class="btn btn--outline btn--block social-btn" data-social="Google">Google</button>
+            <button type="button" class="btn btn--outline btn--block social-btn" data-social="Apple">Apple</button>
+          </div>
+        </form>
+
+        <!-- REGISTER -->
+        <form class="auth__form" id="registerForm" hidden novalidate>
+          <h2>Create your account</h2>
+          <p class="auth__sub">Join the community and share your first book.</p>
+          <div class="field">
+            <label for="regName">Full name</label>
+            <input type="text" id="regName" placeholder="Ava Larsen" required />
+            <small class="field__err"></small>
+          </div>
+          <div class="field">
+            <label for="regEmail">Email</label>
+            <input type="email" id="regEmail" placeholder="you@email.com" required />
+            <small class="field__err"></small>
+          </div>
+          <div class="field">
+            <label for="regPassword">Password</label>
+            <div class="field__pw">
+              <input type="password" id="regPassword" placeholder="Create a password" required />
+              <button type="button" class="pw-toggle" data-pw="regPassword" aria-label="Show password">👁</button>
+            </div>
+            <div class="pw-strength"><span id="pwBar"></span></div>
+            <small class="pw-label" id="pwLabel">Enter a password</small>
+          </div>
+          <div class="field">
+            <label for="regConfirm">Confirm password</label>
+            <input type="password" id="regConfirm" placeholder="Repeat password" required />
+            <small class="field__err"></small>
+          </div>
+          <div class="field">
+            <label for="regLocation">Location</label>
+            <input type="text" id="regLocation" placeholder="Your neighbourhood" required />
+            <small class="field__err"></small>
+          </div>
+          <label class="check"><input type="checkbox" id="regTerms" required /> I agree to the Terms & Privacy Policy</label>
+          <button type="submit" class="btn btn--primary btn--block">Create Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ADD/EDIT BOOK MODAL ============ -->
+  <div class="modal" id="bookFormModal" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__dialog modal__dialog--auth" role="dialog" aria-modal="true" aria-labelledby="bookFormTitle">
+      <button class="modal__close" data-close aria-label="Close">✕</button>
+      <form class="auth" id="bookForm" novalidate>
+        <h2 id="bookFormTitle">List a book</h2>
+        <p class="auth__sub">Share a book with readers near you.</p>
+        <input type="hidden" id="bookFormId" />
+        <div class="field"><label for="bfTitle">Title</label><input type="text" id="bfTitle" required /><small class="field__err"></small></div>
+        <div class="field"><label for="bfAuthor">Author</label><input type="text" id="bfAuthor" required /><small class="field__err"></small></div>
+        <div class="field two">
+          <div><label for="bfGenre">Genre</label>
+            <select id="bfGenre"><option>Fiction</option><option>Non-fiction</option><option>Sci-Fi</option><option>Self-Help</option><option>Fantasy</option><option>Biography</option></select>
+          </div>
+          <div><label for="bfType">Offer as</label>
+            <select id="bfType"><option>Borrow</option><option>Exchange</option><option>Buy</option></select>
+          </div>
+        </div>
+        <div class="field two">
+          <div><label for="bfPrice">Price ($, 0 if free)</label><input type="number" id="bfPrice" min="0" value="0" /></div>
+          <div><label for="bfStatus">Status</label>
+            <select id="bfStatus"><option value="available">Available</option><option value="unavailable">Unavailable</option></select>
+          </div>
+        </div>
+        <div class="field"><label for="bfDesc">Description</label><textarea id="bfDesc" rows="3" placeholder="A short note about the book&apos;s condition..."></textarea></div>
+        <button type="submit" class="btn btn--primary btn--block">Save Book</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ EXCHANGE MODAL ============ -->
+  <div class="modal" id="exchangeModal" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__dialog modal__dialog--auth" role="dialog" aria-modal="true" aria-labelledby="exchangeTitle">
+      <button class="modal__close" data-close aria-label="Close">✕</button>
+      <div class="exchange" id="exchangeContent"></div>
+    </div>
+  </div>
+
+  <!-- ============ CHAT DRAWER ============ -->
+  <div class="chat-drawer" id="chatDrawer" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="chat" role="dialog" aria-modal="true" aria-label="Messages">
+      <aside class="chat__list">
+        <div class="chat__search">
+          <input type="search" id="convSearch" placeholder="Search conversations" />
+        </div>
+        <div class="conv-list" id="convList"></div>
+      </aside>
+      <section class="chat__thread">
+        <header class="chat__head" id="chatHead"></header>
+        <div class="chat__messages" id="chatMessages"></div>
+        <div class="typing" id="typing" hidden><span></span><span></span><span></span></div>
+        <form class="chat__input" id="chatForm">
+          <button type="button" class="icon-btn" id="emojiBtn" aria-label="Emoji">😊</button>
+          <button type="button" class="icon-btn" id="attachBtn" aria-label="Attach">📎</button>
+          <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off" />
+          <button type="submit" class="btn btn--primary chat__send">Send</button>
+        </form>
+      </section>
+      <button class="chat__close" data-close aria-label="Close chat">✕</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
